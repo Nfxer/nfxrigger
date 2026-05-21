@@ -8,6 +8,7 @@ $modes = @{
     2 = "Blackjack"
     3 = "Paper"
     4 = "HiLo"
+    5 = "Russian Roulette"
 }
 
 function Get-StateValue {
@@ -40,7 +41,7 @@ function Get-BindName {
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Nfx Status Overlay"
-$form.Size = New-Object System.Drawing.Size(460, 185)
+$form.Size = New-Object System.Drawing.Size(460, 205)
 $form.StartPosition = "Manual"
 $form.Location = New-Object System.Drawing.Point(40, 40)
 $form.TopMost = $true
@@ -133,6 +134,10 @@ $timer.Add_Tick({
     $paperLowPlayer = -1
     try { $paperLowPlayer = [int](Get-StateValue $state "paper_low_player" -1) } catch {}
     $paperLowBind = Get-BindName (Get-StateValue $state "paper_low_bind" $null)
+    $rouletteOutcome = [string](Get-StateValue $state "roulette_outcome" $winner)
+    if ([string]::IsNullOrWhiteSpace($rouletteOutcome)) {
+        $rouletteOutcome = $winner
+    }
 
     $modeLabel.Text = "Mode: $mode"
     if ($tab -eq 3) {
@@ -144,6 +149,9 @@ $timer.Add_Tick({
             $featureLabel.Text = "Paper Force Low: OFF | Toggle: $paperLowBind"
             $featureLabel.ForeColor = [System.Drawing.Color]::DimGray
         }
+    } elseif ($tab -eq 5) {
+        $featureLabel.Text = "Russian Target: $rouletteOutcome"
+        $featureLabel.ForeColor = [System.Drawing.Color]::FromArgb(102, 204, 255)
     } else {
         $featureLabel.Text = ""
         $featureLabel.ForeColor = [System.Drawing.Color]::DimGray
